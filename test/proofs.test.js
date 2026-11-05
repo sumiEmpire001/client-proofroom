@@ -1,0 +1,12 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {addProof,review,revise,totals} from "../proofs.js";
+const seed=()=>addProof([],{id:"p1",title:"Landing page"});
+test("new proof pending",()=>assert.equal(seed()[0].status,"pending"));
+test("duplicate ID",()=>assert.throws(()=>addProof(seed(),{id:"p1",title:"Another page"})));
+test("approve",()=>assert.equal(review(seed(),"p1","approved")[0].status,"approved"));
+test("request changes",()=>assert.equal(review(seed(),"p1","changes_requested","Fix spacing")[0].comments.length,1));
+test("invalid review",()=>assert.throws(()=>review(seed(),"p1","pending")));
+test("new revision resets status",()=>assert.equal(revise(review(seed(),"p1","approved"),"p1")[0].status,"pending"));
+test("revision increments version",()=>assert.equal(revise(seed(),"p1")[0].version,2));
+test("summary counts",()=>assert.equal(totals(seed()).pending,1));
