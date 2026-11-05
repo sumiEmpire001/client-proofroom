@@ -1,0 +1,5 @@
+export const decisions=["pending","approved","changes_requested"];
+export function addProof(items,{id,title,version=1}){if(typeof id!=="string"||!id.trim()||typeof title!=="string"||title.trim().length<3||!Number.isInteger(version)||version<1)throw Error("Invalid proof");if(items.some(x=>x.id===id))throw Error("Duplicate ID");return [...items,{id,title:title.trim(),version,status:"pending",comments:[]}];}
+export function review(items,id,status,comment=""){if(!decisions.includes(status)||status==="pending")throw Error("Invalid review status");if(!items.some(x=>x.id===id))throw Error("Proof not found");if(typeof comment!=="string"||comment.length>1000)throw Error("Invalid comment");return items.map(item=>item.id===id?{...item,status,comments:comment.trim()?[...item.comments,{status,text:comment.trim()}]:item.comments}:item);}
+export function revise(items,id){if(!items.some(x=>x.id===id))throw Error("Proof not found");return items.map(item=>item.id===id?{...item,version:item.version+1,status:"pending"}:item);}
+export function totals(items){return Object.fromEntries(decisions.map(s=>[s,items.filter(item=>item.status===s).length]));}
